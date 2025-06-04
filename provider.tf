@@ -6,13 +6,9 @@ terraform {
       version = "5.96.0"
     }
   }
-  cloud { 
-    
-    organization = "ottone" 
+}
 
-    workspaces { 
-      name = "ottone-workspace"
-
-    } 
-  } 
+provider "aws" {
+  # Configuration options
+  region = "us-east-2"
 }
