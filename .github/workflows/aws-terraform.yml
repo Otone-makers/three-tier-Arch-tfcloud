@@ -18,11 +18,6 @@ jobs:
       packages: write
 
     steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-      - name: tfsec
-        uses: aquasecurity/tfsec-action@v1.0.0
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -48,35 +43,11 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        env:
-          TF_LOG: ERROR
         
       - name: Terraform Plan
         id: plan
-        run: terraform plan -input=false -out=tfplan
-        env:
-          TF_LOG: ERROR
-
-      - name: Create PR Comment with Plan Output
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
-      with:
-        script: |
-            const fs = require('fs');
-            const planOutput = fs.readFileSync('plan.json', 'utf8');
-            const comment = `### Terraform Plan Result\n\`\`\`json\n${planOutput}\n\`\`\``;
-            const issue_number = context.payload.pull_request.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: comment,
-            });
+        run: terraform plan -no-color
          
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
-        env:
-          TF_LOG: ERROR
+        run: terraform apply -auto-approve
+
